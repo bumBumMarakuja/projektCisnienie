@@ -60,7 +60,8 @@ static void MX_TIM1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint32_t counter = 60;
-uint32_t state = 0;
+uint8_t state = 0;
+uint8_t program = 0;
 uint8_t temp1, temp2, temp3, temp4;
 uint8_t segmentNumber[10][7] = {
 		{1, 0, 0, 0, 0, 0, 0},  // 0
@@ -85,44 +86,166 @@ void SevenSegment_Update(uint8_t number){
 	HAL_GPIO_WritePin(SevSegG_GPIO_Port, SevSegG_Pin, segmentNumber[number][0]);
 }
 
+
+void First_program(){
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 1);
+    HAL_Delay(5000);
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 0);
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    state = 0;
+    program = 0;
+}
+
 void Second_program(){
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
     HAL_TIM_Base_Start_IT(&htim1);
-    temp1 = counter/1000;
-    temp2 = ((counter/100)%10);
-    temp3 = ((counter/10)%10);
-    temp4 = (counter%10);
-    SevenSegment_Update(temp2);
-    HAL_GPIO_WritePin(D2_GPIO_Port, D2_Pin, GPIO_PIN_SET);
-    HAL_Delay(5);
-    HAL_GPIO_WritePin(D2_GPIO_Port, D2_Pin, GPIO_PIN_RESET);
+    while (counter > 0){
+    	temp1 = counter/1000;
+    	temp2 = ((counter/100)%10);
+    	temp3 = ((counter/10)%10);
+    	temp4 = (counter%10);
+    	SevenSegment_Update(temp2);
+    	HAL_GPIO_WritePin(D2_GPIO_Port, D2_Pin, GPIO_PIN_SET);
+    	HAL_Delay(5);
+    	HAL_GPIO_WritePin(D2_GPIO_Port, D2_Pin, GPIO_PIN_RESET);
 
-    SevenSegment_Update(temp3);
-    HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, GPIO_PIN_SET);
-    HAL_Delay(5);
-    HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, GPIO_PIN_RESET);
+    	SevenSegment_Update(temp3);
+    	HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, GPIO_PIN_SET);
+    	HAL_Delay(5);
+    	HAL_GPIO_WritePin(D3_GPIO_Port, D3_Pin, GPIO_PIN_RESET);
 
+    	SevenSegment_Update(temp4);
+    	HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, GPIO_PIN_SET);
+    	HAL_Delay(5);
+    	HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, GPIO_PIN_RESET);}
 
-    SevenSegment_Update(temp4);
-    HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, GPIO_PIN_SET);
-    HAL_Delay(5);
-    HAL_GPIO_WritePin(D4_GPIO_Port, D4_Pin, GPIO_PIN_RESET);
-
-    if (counter == 0){
-    	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1);
-    	HAL_Delay(1000);
-    	HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
-    	counter = 60;
-    	state = 0;
-    }
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
+    counter = 60;
+    state = 0;
+    program = 0;
     HAL_TIM_Base_Stop_IT(&htim1);
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
 }
+
+void Third_program(){
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+    HAL_Delay(5000);
+    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 0);
+    state = 0;
+    program = 0;
+}
+
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
  counter--;
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == USER_BUTTON_Pin) {
+	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+  }
+}
+
 
 /* USER CODE END 0 */
 
@@ -165,16 +288,36 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
-  {
-	  if ((HAL_GPIO_ReadPin(USER_BUTTON_2_GPIO_Port, USER_BUTTON_2_Pin) == GPIO_PIN_RESET)&&(state == 0)) {
-		  state = 2;
+  {    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	  // przycisk do programu 1
+	  if ((HAL_GPIO_ReadPin(USER_BUTTON_1_GPIO_Port, USER_BUTTON_1_Pin) == GPIO_PIN_RESET)&&(state == 0)) {
+		  program = 1;
+		  state = 1;
+		  HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 0);
 	  }
+	  // przycisk do programu 2
+	  if ((HAL_GPIO_ReadPin(USER_BUTTON_2_GPIO_Port, USER_BUTTON_2_Pin) == GPIO_PIN_RESET)&&(state == 0)) {
+		  program = 2;
+		  state = 1;
+		  HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 0);
+	  }
+	  // przycisk do programu 3
+	  if ((HAL_GPIO_ReadPin(USER_BUTTON_3_GPIO_Port, USER_BUTTON_3_Pin) == GPIO_PIN_RESET)&&(state == 0)) {
+		  program = 3;
+		  state = 1;
+		  HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 0);
+	  }
+
 	  	/*const char message[] = "Hello world!\r\n";
 	    HAL_UART_Transmit(&huart2, (uint8_t*)message, strlen(message), HAL_MAX_DELAY);*/
-	  switch (state){
-	  case 2: Second_program();
+	  switch (program){
+	  case 1: First_program(); 		//egzekucja pierwszego programu
 	  break;
-	  default: HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+	  case 2: Second_program();		//egzekucja drugiego programu
+	  break;
+	  case 3: Third_program();		//egzekucja trzeciego programu
+	  break;
+	  default: HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 1);
 	    }
     /* USER CODE END WHILE */
 
@@ -243,11 +386,18 @@ static void MX_TIM1_Init(void)
   htim1.Instance = TIM1;
   htim1.Init.Prescaler = 999;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 3999;
+  htim1.Init.Period = 999;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   /* USER CODE END TIM1_Init 1 */
+  htim1.Instance = TIM1;
+  htim1.Init.Prescaler = 3996;
+  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim1.Init.Period = 3999;
+  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim1.Init.RepetitionCounter = 0;
+  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
   {
     Error_Handler();
@@ -330,29 +480,29 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, D2_Pin|SevSegA_Pin|SevSegF_Pin|D1_Pin
-                          |LD3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LD3_Pin|D2_Pin|SevSegA_Pin|SevSegF_Pin
+                          |D1_Pin|LD2_Pin|LD10_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, D3_Pin|SevSegD_Pin|SevSegG_Pin|SevSegE_Pin
                           |D4_Pin|GPIO_PIN_5, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, SevSegC_Pin|SevSegB_Pin|BUZZER_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : D2_Pin SevSegA_Pin SevSegF_Pin D1_Pin
-                           LD3_Pin */
-  GPIO_InitStruct.Pin = D2_Pin|SevSegA_Pin|SevSegF_Pin|D1_Pin
-                          |LD3_Pin;
+  /*Configure GPIO pins : LD3_Pin D2_Pin SevSegA_Pin SevSegF_Pin
+                           D1_Pin LD2_Pin LD10_Pin */
+  GPIO_InitStruct.Pin = LD3_Pin|D2_Pin|SevSegA_Pin|SevSegF_Pin
+                          |D1_Pin|LD2_Pin|LD10_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -360,7 +510,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : USER_BUTTON_Pin */
   GPIO_InitStruct.Pin = USER_BUTTON_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
@@ -373,12 +523,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
+  /*Configure GPIO pin : LD1_Pin */
+  GPIO_InitStruct.Pin = LD1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(LD1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : USER_BUTTON_4_Pin */
+  GPIO_InitStruct.Pin = USER_BUTTON_4_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USER_BUTTON_4_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SevSegC_Pin SevSegB_Pin BUZZER_Pin */
   GPIO_InitStruct.Pin = SevSegC_Pin|SevSegB_Pin|BUZZER_Pin;
@@ -387,11 +543,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : USER_BUTTON_2_Pin */
-  GPIO_InitStruct.Pin = USER_BUTTON_2_Pin;
+  /*Configure GPIO pin : USER_BUTTON_1_Pin */
+  GPIO_InitStruct.Pin = USER_BUTTON_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(USER_BUTTON_2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(USER_BUTTON_1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : USER_BUTTON_2_Pin USER_BUTTON_3_Pin */
+  GPIO_InitStruct.Pin = USER_BUTTON_2_Pin|USER_BUTTON_3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI4_15_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_15_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */

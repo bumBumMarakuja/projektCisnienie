@@ -1,0 +1,13 @@
+../Core/Src/main.c:81:6:SevenSegment_Update	1
+../Core/Src/main.c:91:6:ProgramEnd	1
+../Core/Src/main.c:106:6:First_program	3
+../Core/Src/main.c:114:6:Second_program	3
+../Core/Src/main.c:143:6:Third_program	3
+../Core/Src/main.c:152:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:164:5:main	11
+../Core/Src/main.c:264:6:SystemClock_Config	3
+../Core/Src/main.c:305:13:MX_TIM1_Init	7
+../Core/Src/main.c:386:13:MX_TIM3_Init	4
+../Core/Src/main.c:431:13:MX_GPIO_Init	1
+../Core/Src/main.c:522:6:HAL_GPIO_EXTI_Rising_Callback	2
+../Core/Src/main.c:535:6:Error_Handler	1
