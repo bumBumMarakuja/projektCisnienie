@@ -103,6 +103,9 @@ void SevenSegment_Update(uint8_t number){
 }
 
 void ProgramEnd(){
+    HAL_TIM_Base_Stop_IT(&htim3);
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
 	HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 1);
     HAL_GPIO_WritePin(BUZZER_GPIO_Port, BUZZER_Pin, 1);
     HAL_Delay(1000);
@@ -114,6 +117,19 @@ void ProgramEnd(){
     HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 1);
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
     HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
+    HAL_GPIO_WritePin(RGB1_R_GPIO_Port, RGB1_R_Pin, 1);
+    HAL_GPIO_WritePin(RGB2_R_GPIO_Port, RGB2_R_Pin, 1);
+    HAL_GPIO_WritePin(RGB1_G_GPIO_Port, RGB1_G_Pin, 0);
+    HAL_GPIO_WritePin(RGB2_G_GPIO_Port, RGB2_G_Pin, 0);
+}
+
+void ProgramStart(){
+	TIM2->CCR1 = progPWM[1][0];
+	TIM2->CCR2 = progPWM[1][1];
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+	HAL_TIM_Base_Start_IT(&htim3);
+	state =2;
 }
 
 
@@ -132,19 +148,16 @@ void First_program(){
 
 	if ((pressChamber > presThreshold)||(interruptFlag == 1) || (counter <= 0)){
 	    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 0);
-	    HAL_TIM_Base_Stop_IT(&htim3);
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
 	    ProgramEnd();
 	}
 }
 
 void Second_program(){
+	if ((HAL_GPIO_ReadPin(USER_BUTTON_CONFIRM_GPIO_Port, USER_BUTTON_CONFIRM_Pin) == GPIO_PIN_RESET)&&(state == 1)) {
+		ProgramStart();
+	}
     if ((interruptFlag == 1) || (counter <= 0)){
 	    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
-	    HAL_TIM_Base_Stop_IT(&htim3);
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
 	    ProgramEnd();
     }
     else {
@@ -169,11 +182,11 @@ void Second_program(){
 }
 
 void Third_program(){
+	if ((HAL_GPIO_ReadPin(USER_BUTTON_CONFIRM_GPIO_Port, USER_BUTTON_CONFIRM_Pin) == GPIO_PIN_RESET)&&(state == 1)) {
+		ProgramStart();
+	}
 	if ((interruptFlag == 1) || (counter <= 0)){
 	    HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
-	    HAL_TIM_Base_Stop_IT(&htim3);
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_1);
-		HAL_TIM_PWM_Stop(&htim2, TIM_CHANNEL_2);
 	    ProgramEnd();
 	}
 	else if (counter == 30)
@@ -235,6 +248,9 @@ int main(void)
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
   HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 1);
 
+  HAL_GPIO_WritePin(RGB1_R_GPIO_Port, RGB1_R_Pin, 1);
+  HAL_GPIO_WritePin(RGB2_R_GPIO_Port, RGB2_R_Pin, 1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -247,14 +263,11 @@ int main(void)
    		  program = 1;
    		  state = 1;
    		  interruptFlag = 0;
-   		  HAL_TIM_Base_Start_IT(&htim3);
    		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
    		  HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
    		  HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 0);
-   		  TIM2->CCR1 = progPWM[0][0];
-   		  TIM2->CCR2 = progPWM[0][1];
-   		  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-   		  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+   		  HAL_GPIO_WritePin(RGB1_R_GPIO_Port, RGB1_R_Pin, 0);
+   		  HAL_GPIO_WritePin(RGB1_G_GPIO_Port, RGB1_R_Pin, 1);
    	  }
    	  // przycisk do programu 2
    	   if ((HAL_GPIO_ReadPin(USER_BUTTON_2_GPIO_Port, USER_BUTTON_2_Pin) == GPIO_PIN_RESET)&&(state == 0)) {
@@ -262,14 +275,11 @@ int main(void)
    		  program = 2;
    		  state = 1;
    		  interruptFlag = 0;
-   		  HAL_TIM_Base_Start_IT(&htim3);
    		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 0);
    		  HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin, 0);
    		  HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 0);
-   		  TIM2->CCR1 = progPWM[1][0];
-   		  TIM2->CCR2 = progPWM[1][1];
-   		  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-   		  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+   		  HAL_GPIO_WritePin(RGB2_R_GPIO_Port, RGB2_R_Pin, 0);
+   		  HAL_GPIO_WritePin(RGB2_G_GPIO_Port, RGB2_G_Pin, 1);
    	  }
    	  // przycisk do programu 3
    	  if ((HAL_GPIO_ReadPin(USER_BUTTON_3_GPIO_Port, USER_BUTTON_3_Pin) == GPIO_PIN_RESET)&&(state == 0)) {
@@ -277,14 +287,13 @@ int main(void)
    		  program = 3;
    		  state = 1;
    		  interruptFlag = 0;
-   		  HAL_TIM_Base_Start_IT(&htim3);
    		  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
    		  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, 0);
    		  HAL_GPIO_WritePin(LD10_GPIO_Port, LD10_Pin, 0);
-   		  TIM2->CCR1 = progPWM[2][0];
-   		  TIM2->CCR2 = progPWM[2][1];
-   		  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-   		  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+   		  HAL_GPIO_WritePin(RGB1_R_GPIO_Port, RGB1_R_Pin, 0);
+   		  HAL_GPIO_WritePin(RGB1_G_GPIO_Port, RGB1_G_Pin, 1);
+   		  HAL_GPIO_WritePin(RGB2_R_GPIO_Port, RGB2_R_Pin, 0);
+   		  HAL_GPIO_WritePin(RGB2_G_GPIO_Port, RGB2_G_Pin, 1);
    	  }
 
    	  	/*const char message[] = "Hello world!\r\n";
@@ -561,45 +570,47 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5|SevSegD_Pin|SevSegE_Pin|D4_Pin
-                          |BUZZER_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, RGB1_B_Pin|LD10_Pin|LD1_Pin|RGB2_R_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LD10_Pin|LD1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5|SevSegD_Pin|SevSegE_Pin|D4_Pin
+                          |BUZZER_Pin|RGB2_G_Pin|RGB2_B_Pin|RGB1_R_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, SevSegF_Pin|SevSegA_Pin|D1_Pin|SevSegB_Pin
                           |D3_Pin|D2_Pin|SevSegC_Pin|SevSegG_Pin
-                          |LD2_Pin|LD3_Pin, GPIO_PIN_RESET);
+                          |RGB1_G_Pin|LD2_Pin|LD3_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : STM_BUTTON_Pin USER_BUTTON_3_Pin USER_BUTTON_2_Pin USER_BUTTON_1_Pin */
-  GPIO_InitStruct.Pin = STM_BUTTON_Pin|USER_BUTTON_3_Pin|USER_BUTTON_2_Pin|USER_BUTTON_1_Pin;
+  /*Configure GPIO pins : STM_BUTTON_Pin USER_BUTTON_3_Pin USER_BUTTON_2_Pin USER_BUTTON_1_Pin
+                           USER_BUTTON_CONFIRM_Pin */
+  GPIO_InitStruct.Pin = STM_BUTTON_Pin|USER_BUTTON_3_Pin|USER_BUTTON_2_Pin|USER_BUTTON_1_Pin
+                          |USER_BUTTON_CONFIRM_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : RGB1_B_Pin LD10_Pin LD1_Pin RGB2_R_Pin */
+  GPIO_InitStruct.Pin = RGB1_B_Pin|LD10_Pin|LD1_Pin|RGB2_R_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
   /*Configure GPIO pins : PA5 SevSegD_Pin SevSegE_Pin D4_Pin
-                           BUZZER_Pin */
+                           BUZZER_Pin RGB2_G_Pin RGB2_B_Pin RGB1_R_Pin */
   GPIO_InitStruct.Pin = GPIO_PIN_5|SevSegD_Pin|SevSegE_Pin|D4_Pin
-                          |BUZZER_Pin;
+                          |BUZZER_Pin|RGB2_G_Pin|RGB2_B_Pin|RGB1_R_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD10_Pin LD1_Pin */
-  GPIO_InitStruct.Pin = LD10_Pin|LD1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
   /*Configure GPIO pins : SevSegF_Pin SevSegA_Pin D1_Pin SevSegB_Pin
                            D3_Pin D2_Pin SevSegC_Pin SevSegG_Pin
-                           LD2_Pin LD3_Pin */
+                           RGB1_G_Pin LD2_Pin LD3_Pin */
   GPIO_InitStruct.Pin = SevSegF_Pin|SevSegA_Pin|D1_Pin|SevSegB_Pin
                           |D3_Pin|D2_Pin|SevSegC_Pin|SevSegG_Pin
-                          |LD2_Pin|LD3_Pin;
+                          |RGB1_G_Pin|LD2_Pin|LD3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

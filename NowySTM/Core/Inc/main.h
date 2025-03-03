@@ -61,6 +61,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define STM_BUTTON_Pin GPIO_PIN_13
 #define STM_BUTTON_GPIO_Port GPIOC
+#define RGB1_B_Pin GPIO_PIN_2
+#define RGB1_B_GPIO_Port GPIOC
 #define LD10_Pin GPIO_PIN_4
 #define LD10_GPIO_Port GPIOC
 #define USER_BUTTON_3_Pin GPIO_PIN_5
@@ -94,10 +96,22 @@ void Error_Handler(void);
 #define RESET_BUTTON_Pin GPIO_PIN_12
 #define RESET_BUTTON_GPIO_Port GPIOA
 #define RESET_BUTTON_EXTI_IRQn EXTI15_10_IRQn
+#define RGB2_G_Pin GPIO_PIN_13
+#define RGB2_G_GPIO_Port GPIOA
+#define RGB2_B_Pin GPIO_PIN_14
+#define RGB2_B_GPIO_Port GPIOA
+#define RGB1_R_Pin GPIO_PIN_15
+#define RGB1_R_GPIO_Port GPIOA
+#define USER_BUTTON_CONFIRM_Pin GPIO_PIN_10
+#define USER_BUTTON_CONFIRM_GPIO_Port GPIOC
+#define RGB2_R_Pin GPIO_PIN_12
+#define RGB2_R_GPIO_Port GPIOC
 #define SevSegC_Pin GPIO_PIN_4
 #define SevSegC_GPIO_Port GPIOB
 #define SevSegG_Pin GPIO_PIN_5
 #define SevSegG_GPIO_Port GPIOB
+#define RGB1_G_Pin GPIO_PIN_7
+#define RGB1_G_GPIO_Port GPIOB
 #define LD2_Pin GPIO_PIN_8
 #define LD2_GPIO_Port GPIOB
 #define LD3_Pin GPIO_PIN_9
